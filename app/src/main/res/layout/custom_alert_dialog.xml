@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:padding="10dp"
+    android:id="@+id/dialoguebox">
+
+    <TextView
+        android:id="@+id/alert_head"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:text="@string/app_name"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimary"/>
+    <TextView
+        android:id="@+id/alert_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/alert_head"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        android:text="Need Contacts Permission"
+        android:textSize="18sp"
+        android:typeface="sans"
+        android:textColor="@color/black"/>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/alert_text"
+        android:layout_marginTop="15dp"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/alert_yes"
+            android:layout_width="100dp"
+            android:layout_height="35dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/blue_rounded_corners"
+            android:gravity="center"
+            android:text="OK"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            />
+
+        <Button
+            android:id="@+id/alert_no"
+            android:layout_width="100dp"
+            android:layout_height="35dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/blue_rounded_corners"
+            android:gravity="center"
+            android:text="NO"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            android:typeface="sans" />
+    </LinearLayout>
+
+</RelativeLayout>
