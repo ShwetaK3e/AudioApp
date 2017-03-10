@@ -13,9 +13,12 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,6 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.shwetak3e.audioapp.supportClass.VokesAdapter;
 
@@ -40,6 +44,8 @@ public class VokesListActivity extends AppCompatActivity {
 
     private ListView vokesList;
     private Button record;
+    private ProgressBar playProgress;
+    private ProgressBar downloadProgress;
 
 
     private List<String> allVokesURL=new ArrayList<>();
@@ -50,11 +56,16 @@ public class VokesListActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private String fileName="";
     private int selectedPos=0;
+    private final int MAX_VOLUME=100;
+    private float volume;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vokes_list);
+
+        playProgress=(ProgressBar)findViewById(R.id.playProgress);
+        downloadProgress=(ProgressBar)findViewById(R.id.downloadProgress);
 
         record=(Button)findViewById(R.id.addAudio);
         record.setOnClickListener(new View.OnClickListener() {
@@ -79,14 +90,13 @@ public class VokesListActivity extends AppCompatActivity {
             }
         });
 
-
-
+        volume=(float) (1 - (Math.log(MAX_VOLUME - MAX_VOLUME) / Math.log(MAX_VOLUME)));
     }
 
     private void downloadURL(String s) {
         storageReference=FirebaseStorage.getInstance().getReferenceFromUrl(s);
         File file=null;
-
+        downloadProgress.setVisibility(View.VISIBLE);
         file = new File(Environment.getExternalStorageDirectory().getAbsoluteFile()+"/"+allVokesName.get(selectedPos));
         fileName= file.getAbsolutePath();
         Log.i("TAG1",fileName);
@@ -98,7 +108,18 @@ public class VokesListActivity extends AppCompatActivity {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-
+                Toast.makeText(VokesListActivity.this,"Download has Failed. Retry",Toast.LENGTH_LONG).show();
+            }
+        }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                float progress=100*(taskSnapshot.getBytesTransferred()/taskSnapshot.getTotalByteCount());
+                downloadProgress.setProgress((int)progress);
+            }
+        }).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
+                Toast.makeText(VokesListActivity.this,"Your voke has been downloaded",Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -143,7 +164,9 @@ public class VokesListActivity extends AppCompatActivity {
     }
     
     private void playVoke() {
+        playProgress.setVisibility(View.VISIBLE);
         mediaPlayer = new MediaPlayer();
+        mediaPlayer.setVolume(volume,volume);
         try {
             mediaPlayer.setDataSource(fileName);
             mediaPlayer.prepare();
@@ -153,6 +176,8 @@ public class VokesListActivity extends AppCompatActivity {
                 public void onCompletion(MediaPlayer mp) {
                     mediaPlayer.stop();
                     mediaPlayer.release();
+                    playProgress.setVisibility(View.INVISIBLE);
+                    downloadProgress.setVisibility(View.INVISIBLE);
                 }
             });
             Log.i("TAG", "play");
@@ -165,10 +190,14 @@ public class VokesListActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if(mediaPlayer!=null){
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer=null;
+        try {
+            if (mediaPlayer != null) {
+                mediaPlayer.stop();
+                mediaPlayer.release();
+                mediaPlayer = null;
+            }
+        }catch(IllegalStateException e){
+            e.printStackTrace();
         }
 
     }

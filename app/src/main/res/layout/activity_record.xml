@@ -65,6 +65,16 @@
         android:text="SEND"
         android:id="@+id/send"/>
 
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/uploadProgress"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:max="100"
+        android:visibility="invisible"/>
+
 
 
 

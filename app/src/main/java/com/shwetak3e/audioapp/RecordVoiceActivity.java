@@ -15,8 +15,10 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FileDownloadTask;
@@ -34,6 +36,7 @@ import java.io.IOException;
 public class RecordVoiceActivity extends AppCompatActivity {
 
     private ProgressBar progress;
+    private ProgressBar uploadProgress;
 
 
     private final String audioDirName="myVoices";
@@ -58,6 +61,9 @@ public class RecordVoiceActivity extends AppCompatActivity {
 
         progress = (ProgressBar) findViewById(R.id.progress);
         progress.setVisibility(View.INVISIBLE);
+
+        uploadProgress=(ProgressBar)findViewById(R.id.uploadProgress);
+        uploadProgress.setVisibility(View.INVISIBLE);
 
         myfileName=(EditText)findViewById(R.id.fileName);
 
@@ -237,6 +243,7 @@ public class RecordVoiceActivity extends AppCompatActivity {
             StorageMetadata metadata = new StorageMetadata.Builder()
                     .setContentType("audio/*")
                     .build();
+            uploadProgress.setVisibility(View.VISIBLE);
             riversRef.putFile(file, metadata)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
@@ -251,18 +258,24 @@ public class RecordVoiceActivity extends AppCompatActivity {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception exception) {
-                            Log.i("TAG", "fail");
+                            Toast.makeText(RecordVoiceActivity.this,"Upload has Failed. Retry",Toast.LENGTH_LONG).show();
                         }
                     }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
                     double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                    System.out.println("Upload is " + progress + "% done");
+                    uploadProgress.setProgress((int)progress);
+                    Log.i("TAG","Upload is " + progress + "% done");
                 }
             }).addOnPausedListener(new OnPausedListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onPaused(UploadTask.TaskSnapshot taskSnapshot) {
-                    System.out.println("Upload is paused");
+                    Log.i("TAG","Upload is paused");
+                }
+            }).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    Toast.makeText(RecordVoiceActivity.this,"Your voke has been sent",Toast.LENGTH_LONG).show();
                 }
             });
 

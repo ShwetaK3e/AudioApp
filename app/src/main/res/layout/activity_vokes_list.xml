@@ -23,7 +23,8 @@
 
     <ListView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:id="@+id/vokesList"
         android:layout_margin="5dp"
         android:dividerHeight="0.5dp"
@@ -31,11 +32,31 @@
         android:padding="2dp"
         android:background="@drawable/bg_rounded_square_holder"></ListView>
 
+    <ProgressBar
+        android:id="@+id/playProgress"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:visibility="invisible"
+        android:layout_margin="30dp"
+        android:layout_gravity="center_horizontal"
+        android:indeterminateDrawable="@drawable/my_progressbar_style"/>
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="record"
+        android:text="RECORD MY VOKE"
         android:id="@+id/addAudio"
         android:layout_gravity="center_horizontal"/>
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/downloadProgress"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:max="100"
+        android:visibility="invisible"
+        />
 
 </LinearLayout>
